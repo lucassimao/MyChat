@@ -9,6 +9,7 @@ import Grid from '@material-ui/core/Grid';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
+import { Link as RouterLink } from 'react-router-dom';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -31,6 +32,8 @@ const useStyles = makeStyles(theme => ({
         fontSize: theme.typography.subtitle1.fontSize
     }
 }))
+
+const SignUpLink = React.forwardRef((props, ref) => <RouterLink to="/signup" innerRef={ref} {...props} />);
 
 function SignIn(props) {
     const classes = useStyles();
@@ -86,7 +89,7 @@ function SignIn(props) {
                         </Link>
                     </Grid> */}
                     <Grid item>
-                        <Link href="#" >
+                        <Link component={SignUpLink} >
                             {"Don't have an account? Sign Up"}
                         </Link>
                     </Grid>
