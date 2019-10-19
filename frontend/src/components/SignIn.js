@@ -15,7 +15,6 @@ const useStyles = makeStyles(theme => ({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        paddingTop: theme.spacing(5)
     },
     avatar: {
         margin: theme.spacing(1),
@@ -26,8 +25,11 @@ const useStyles = makeStyles(theme => ({
         marginTop: theme.spacing(1),
     },
     submit: {
-        margin: theme.spacing(3, 0, 2),
+        margin: theme.spacing(3, 0, 4),
     },
+    bottomGrid: {
+        fontSize: theme.typography.subtitle1.fontSize
+    }
 }))
 
 function SignIn(props) {
@@ -38,7 +40,7 @@ function SignIn(props) {
             <Avatar className={classes.avatar}>
                 <LockOutlinedIcon />
             </Avatar>
-            <Typography component="h1" variant="h5">
+            <Typography className={classes.title} component="h1" variant="h3">
                 Sign in
             </Typography>
             <form className={classes.form} noValidate>
@@ -77,14 +79,14 @@ function SignIn(props) {
                 >
                     Sign In
                 </Button>
-                <Grid container justify="center">
+                <Grid container justify="center" className={classes.bottomGrid}>
                     {/* <Grid item xs>
                         <Link href="#" variant="body2">
                             Forgot password?
                         </Link>
                     </Grid> */}
                     <Grid item>
-                        <Link href="#" variant="body2">
+                        <Link href="#" >
                             {"Don't have an account? Sign Up"}
                         </Link>
                     </Grid>
