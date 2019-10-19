@@ -1,13 +1,8 @@
-import React, {Suspense} from 'react';
-import './App.css';
-import SignIn from './components/SignIn'
 import Container from '@material-ui/core/Container';
 import { makeStyles } from '@material-ui/core/styles';
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-} from "react-router-dom";
+import React, { Suspense } from 'react';
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import SignIn from './components/SignIn';
 
 
 const SignUp = React.lazy(() => import('./components/SignUp'));
