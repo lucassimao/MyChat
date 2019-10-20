@@ -6,6 +6,7 @@ import SignIn from './components/SignIn';
 
 
 const SignUp = React.lazy(() => import('./components/SignUp'));
+const Dashboard = React.lazy(() => import('./components/Dashboard'));
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -20,20 +21,27 @@ function App() {
   const classes = useStyles();
 
   return (
-    <Container className={classes.root} component="main" maxWidth="xs">
-      <Router>
-        <Switch>
-          <Route path="/signup">
-            <Suspense fallback={<div> Loading ...</div>}>
+    <Router>
+      <Switch>
+        <Route path="/signup">
+          <Suspense fallback={<div> Loading ...</div>}>
+            <Container className={classes.root} component="main" maxWidth="xs">
               <SignUp />
-            </Suspense>
-          </Route>
-          <Route path="/">
+            </Container>
+          </Suspense>
+        </Route>
+        <Route path="/dashboard">
+          <Suspense fallback={<div> Loading ...</div>}>
+            <Dashboard />
+          </Suspense>
+        </Route>
+        <Route path="/">
+          <Container className={classes.root} component="main" maxWidth="xs">
             <SignIn />
-          </Route>
-        </Switch>
-      </Router>
-    </Container>
+          </Container>
+        </Route>
+      </Switch>
+    </Router>
   );
 }
 
