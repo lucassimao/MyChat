@@ -1,25 +1,23 @@
 {
   "name": "auth",
   "version": "0.0.1",
-  "description": "Decorebator authentication endpoint",
+  "description": "authentication endpoint",
   "main": "index.js",
   "scripts": {
     "start": "node src/index.js",
     "lint": "eslint 'src/**/*.js'",
-    "test": "jest --detectOpenHandles 'src/'",
     "format": "prettier --write 'src/**/*.js'",
-    "jest-watch": "jest --watch --detectOpenHandles 'src/'"
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/lucassimao/decorebator-app.git"
+    "url": "git+ssh://git@github.com/lucassimao/MyChat.git"
   },
   "author": "Lucas Simao",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/lucassimao/decorebator-app/issues"
+    "url": "https://github.com/lucassimao/MyChat/issues"
   },
-  "homepage": "https://github.com/lucassimao/decorebator-app#readme",
+  "homepage": "https://github.com/lucassimao/MyChat#readme",
   "dependencies": {
     "bcrypt": "^3.0.6",
     "cors": "^2.8.5",
