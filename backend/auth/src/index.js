@@ -2,6 +2,7 @@ const express = require("express");
 const db = require("./db");
 const config = require("./config");
 const rootRouter = require("./routers");
+var cors = require('cors')
 
 db.connect()
   .then(() => {
@@ -9,6 +10,7 @@ db.connect()
 
     app.set("trust proxy", 1);
 
+    app.use(cors());
     app.use("/", rootRouter);
     app.listen(config.port);
 

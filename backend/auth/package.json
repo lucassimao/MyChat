@@ -22,6 +22,7 @@
   "homepage": "https://github.com/lucassimao/decorebator-app#readme",
   "dependencies": {
     "bcrypt": "^3.0.6",
+    "cors": "^2.8.5",
     "express": "^4.17.1",
     "jwt-builder": "^1.1.0",
     "mongoose": "^5.7.5",

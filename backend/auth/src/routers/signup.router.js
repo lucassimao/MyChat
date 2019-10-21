@@ -12,7 +12,7 @@ router.post("/signup", express.json(), async (req, res, next) => {
     switch (error.name) {
       case "MongoError":
         if (error.code === 11000 && "email" in error.keyPattern) {
-          res.status(400).send("User already exists");
+          res.status(400).send("Email already exists");
         }
         if (error.code === 11000 && "nickname" in error.keyPattern) {
           res.status(400).send("Nickname has been already taken");
