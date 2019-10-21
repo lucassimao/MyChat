@@ -17,7 +17,24 @@ function storeCredentials({ nickname, authorizationToken }) {
   localStorage.setItem("nickname", nickname);
 }
 
+function getToken() {
+  return localStorage.getItem('token');
+}
+
+function logOff() {
+  localStorage.removeItem('token')
+  localStorage.removeItem('nickname')
+}
+
+function isLoggedIn(){
+  const token = getToken();
+  return Boolean(token && token.trim());
+}
+
 export default {
-    signin,
-    storeCredentials
+  signin,
+  storeCredentials,
+  getToken,
+  logOff,
+  isLoggedIn
 }

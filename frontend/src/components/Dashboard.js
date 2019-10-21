@@ -5,10 +5,11 @@ import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import FiberNewIcon from '@material-ui/icons/FiberNew';
 import QuestionAnswerIcon from '@material-ui/icons/QuestionAnswer';
-import React from 'react';
-import DashboardToolbar from './DashboardToolbar';
+import React, { useEffect, useState } from 'react';
+import chatroomService from '../services/ChatroomService';
 import ChatRoomWidget from './ChatRoomWidget';
-
+import DashboardToolbar from './DashboardToolbar';
+import PrivateHOC from './PrivateHOC';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -22,30 +23,38 @@ const useStyles = makeStyles(theme => ({
     sectionIcon: {
         marginRight: theme.spacing(1),
         color: theme.palette.primary.light
-    },
-    container: {
-        // marginTop: theme.spacing(2)
-    },
+    }
 }));
 
 
-
-
-export default function Dashboard() {
+function Dashboard() {
     const classes = useStyles();
+    const [roomsByLoggedInUser, setRoomsByLoggedInUser] = useState([]);
+    const [roomsByOtherUsers, setRoomsByOtherUsers] = useState([]);
 
-    const gridItems = [];
+    // loading chat rooms created by the logged in user
+    useEffect(() => {
+        async function loadChatRooms() {
+            const { data: { chatrooms } } = await chatroomService.getChatRoomsCreatedByLoggedInUser();
+            setRoomsByLoggedInUser(chatrooms);
+        }
+        loadChatRooms();
+    }, []);
 
-    for (let i = 0; i < 10; ++i)
-        gridItems.push(<Grid key={i} item xs={12} sm={6} md={3} xl={2}>
-            <ChatRoomWidget image="logo512.png" title="Amigos da bola" content="Grupo destinado a discutir futebol"
-                subheader="September 14, 2016"/>
-        </Grid>);
+    // loading chat rooms created by other users
+    useEffect(() => {
+        async function loadChatRooms() {
+            const { data: { chatrooms } } = await chatroomService.getOthersChatrooms();
+            setRoomsByOtherUsers(chatrooms);
+        }
+        loadChatRooms();
+    }, []);
+
 
     return (
         <div className={classes.root}>
             <AppBar position="static">
-                <DashboardToolbar/>
+                <DashboardToolbar />
             </AppBar>
 
             <Container className={classes.container} component="main" >
@@ -55,7 +64,14 @@ export default function Dashboard() {
                 </Typography>
 
                 <Grid container spacing={2}>
-                    {gridItems}
+                    {roomsByLoggedInUser.map((chatRoom, idx) => {
+                        return (<Grid key={idx} item xs={12} sm={6} md={3} xl={2}>
+                            <ChatRoomWidget image={chatRoom.pic}
+                                title={chatRoom.title}
+                                content={chatRoom.description}
+                                subheader={chatRoom.dateCreated} />
+                        </Grid>)
+                    })}
                 </Grid>
 
                 <Typography variant="h4" className={classes.sectionTitle} color="textPrimary" component="h2">
@@ -63,7 +79,14 @@ export default function Dashboard() {
                 </Typography>
 
                 <Grid container spacing={2}>
-                    {gridItems}
+                    {roomsByOtherUsers.map((chatRoom, idx) => {
+                        return (<Grid key={idx} item xs={12} sm={6} md={3} xl={2}>
+                            <ChatRoomWidget image={chatRoom.pic}
+                                title={chatRoom.title}
+                                content={chatRoom.description}
+                                subheader={chatRoom.dateCreated} />
+                        </Grid>)
+                    })}                
                 </Grid>
             </Container>
 
@@ -71,3 +94,5 @@ export default function Dashboard() {
         </div>
     );
 }
+
+export default PrivateHOC(Dashboard)

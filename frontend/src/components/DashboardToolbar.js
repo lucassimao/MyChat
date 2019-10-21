@@ -2,14 +2,15 @@ import IconButton from '@material-ui/core/IconButton';
 import InputBase from '@material-ui/core/InputBase';
 import { fade, makeStyles } from '@material-ui/core/styles';
 import Toolbar from '@material-ui/core/Toolbar';
+import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import AddCommentIcon from '@material-ui/icons/AddComment';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import SearchIcon from '@material-ui/icons/Search';
 import React from 'react';
-import Tooltip from '@material-ui/core/Tooltip';
-
+import { useHistory } from "react-router-dom";
+import signInService from '../services/SignInService';
 
 const useStyles = makeStyles(theme => ({
     title: {
@@ -57,8 +58,16 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
+
 export default function DashboardToolbar(props) {
     const classes = useStyles();
+    const history = useHistory();
+
+
+    const logoff = () => {
+        signInService.logOff();
+        history.push('/');
+    }
 
     return (
         <Toolbar>
@@ -106,6 +115,7 @@ export default function DashboardToolbar(props) {
                     aria-label="exit application"
                     aria-controls="menu-appbar"
                     color="inherit"
+                    onClick={logoff}
                 >
                     <ExitToAppIcon />
                 </IconButton>
