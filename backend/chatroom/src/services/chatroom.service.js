@@ -4,21 +4,47 @@ const ChatroomDao = require("../dao/chatroom.dao");
 // Registered user should be able to list all chatrooms available and update, delete and create his own chatrooms
 
 /**
- * Returns chatrooms
+ * Returns all chatrooms
  *
  * @param {number} pageSize The amount of chatrooms to be returned
  * @param {number} page As the data set is seen as a set of pages, this param represents the requested page
- * @param {object} user The authenticated user
+ * 
+ * @returns {Promise} A promise, which resolves to an array of chatrooms
+ */
+const list = ({ pageSize = config.defaultPageSize, page = 0 }) => {
+  const skip = page > 0 ? page * pageSize : 0;
+  return ChatroomDao.find({}, null, { limit: pageSize, skip }).sort({ 'dateCreated': 'desc' })
+};
+
+/**
+ * Returns chatrooms created by an user
+ *
+ * @param {number} pageSize The amount of chatrooms to be returned
+ * @param {number} page As the data set is seen as a set of pages, this param represents the requested page
+ * @param {object} user The owner
  * @param {mongoose.Types.ObjectId} user._id The user id
  * 
  * @returns {Promise} A promise, which resolves to an array of chatrooms
  */
-const list = ({ pageSize = config.defaultPageSize, page = 0 }, user) => {
+const listByUser = ({ pageSize = config.defaultPageSize, page = 0 }, user) => {
   const skip = page > 0 ? page * pageSize : 0;
-  let query = user ? {owner: user._id} : {};
+  return ChatroomDao.find({ owner: user._id }, null, { limit: pageSize, skip }).sort({ 'dateCreated': 'desc' })
+}
 
-  return ChatroomDao.find(query, null, { limit: pageSize, skip }).sort({'dateCreated':'desc'})
-};
+/**
+ * Returns chatrooms created by users other than the specified
+ *
+ * @param {number} pageSize The amount of chatrooms to be returned
+ * @param {number} page As the data set is seen as a set of pages, this param represents the requested page
+ * @param {object} user The user
+ * @param {mongoose.Types.ObjectId} user._id The user id
+ * 
+ * @returns {Promise} A promise, which resolves to an array of chatrooms
+ */
+const listByUserOtherThan = ({ pageSize = config.defaultPageSize, page = 0 }, user) => {
+  const skip = page > 0 ? page * pageSize : 0;
+  return ChatroomDao.find({ owner: { '$ne': user._id } }, null, { limit: pageSize, skip }).sort({ 'dateCreated': 'desc' })
+}
 
 /**
  * Creates a new chatroom
@@ -61,6 +87,8 @@ const remove = (id, user) => {
 
 const api = {
   list,
+  listByUser,
+  listByUserOtherThan,
   save,
   update,
   delete: remove

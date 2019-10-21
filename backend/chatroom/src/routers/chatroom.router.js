@@ -3,7 +3,10 @@ const router = express.Router();
 const service = require("../services/chatroom.service");
 
 const wrapAsync = asyncMiddleware => {
-  return (req, res, next) => asyncMiddleware(req, res, next).catch(next);
+  return (req, res, next) => asyncMiddleware(req, res, next).catch(error => {
+    console.error(error);
+    next(error);
+  });
 };
 
 router
@@ -11,7 +14,15 @@ router
     "/mine",
     wrapAsync(async (req, res) => {
       const { page = 0 } = req.query;
-      const chatrooms = await service.list({ page }, req.user);
+      const chatrooms = await service.listByUser({ page }, req.user);
+      res.status(200).send({ chatrooms });
+    })
+  )
+  .get(
+    "/others",
+    wrapAsync(async (req, res) => {
+      const { page = 0 } = req.query;
+      const chatrooms = await service.listByUserOtherThan({ page }, req.user);
       res.status(200).send({ chatrooms });
     })
   )
@@ -33,7 +44,6 @@ router
         res.set("Link", `/chatrooms/${chatroom._id}`);
         res.status(201).end();
       } catch (error) {
-        console.error(error);
 
         if (error.name == "ValidationError") {
           res.status(400).send(error.errors);
