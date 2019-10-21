@@ -41,7 +41,6 @@ export default function SignUp(props) {
   const { register, handleSubmit, errors } = useForm();
   const [alert, setAlert] = useState();
   const [signUpSuccess, setSignUpSuccess] = useState(false);
-
   const history = useHistory();
 
   const onSubmit = async data => {

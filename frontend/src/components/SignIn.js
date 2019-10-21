@@ -1,102 +1,146 @@
-import React from 'react';
-import Avatar from '@material-ui/core/Avatar';
-import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
-import Link from '@material-ui/core/Link';
-import Grid from '@material-ui/core/Grid';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
-import { Link as RouterLink } from 'react-router-dom';
+import Avatar from "@material-ui/core/Avatar";
+import Button from "@material-ui/core/Button";
+import Grid from "@material-ui/core/Grid";
+import Link from "@material-ui/core/Link";
+import { makeStyles } from "@material-ui/core/styles";
+import TextField from "@material-ui/core/TextField";
+import Typography from "@material-ui/core/Typography";
+import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
+import React, { useEffect, useState } from "react";
+import useForm from "react-hook-form";
+import { Link as RouterLink, useHistory } from "react-router-dom";
+import { signin } from "../services/SignInService";
+import AlertDialog, { ERROR_ALERT } from "./AlertDialog";
 
 const useStyles = makeStyles(theme => ({
-    root: {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-    },
-    avatar: {
-        margin: theme.spacing(1),
-        backgroundColor: theme.palette.secondary.main,
-    },
-    form: {
-        width: '100%',
-        marginTop: theme.spacing(1),
-    },
-    submit: {
-        margin: theme.spacing(3, 0, 4),
-    },
-    bottomGrid: {
-        fontSize: theme.typography.subtitle1.fontSize
-    }
-}))
+  root: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center"
+  },
+  avatar: {
+    margin: theme.spacing(1),
+    backgroundColor: theme.palette.secondary.main
+  },
+  form: {
+    width: "100%",
+    marginTop: theme.spacing(1)
+  },
+  submit: {
+    margin: theme.spacing(3, 0, 4)
+  },
+  bottomGrid: {
+    fontSize: theme.typography.subtitle1.fontSize
+  }
+}));
 
 const SignUpLink = React.forwardRef((props, ref) => <RouterLink to="/signup" innerRef={ref} {...props} />);
 
 function SignIn(props) {
-    const classes = useStyles();
+  const classes = useStyles();
+  const { register, handleSubmit } = useForm();
+  const [signInSuccess, setSignInSuccess] = useState(false);
+  const [alert, setAlert] = useState();
+  const history = useHistory();
 
-    return (
-        <div className={classes.root}>
-            <Avatar className={classes.avatar}>
-                <LockOutlinedIcon />
-            </Avatar>
-            <Typography className={classes.title} component="h1" variant="h3">
-                Sign in
-            </Typography>
-            <form className={classes.form} noValidate>
-                <TextField
-                    variant="outlined"
-                    margin="normal"
-                    required
-                    fullWidth
-                    label="Nick name"
-                    name="nick"
-                    autoComplete="nick"
-                    autoFocus
-                />
 
-                <TextField
-                    variant="outlined"
-                    margin="normal"
-                    required
-                    fullWidth
-                    name="password"
-                    label="Password"
-                    type="password"
-                    id="password"
-                    autoComplete="current-password"
-                />
-                <FormControlLabel
+  const onSubmit = async data => {
+    try {
+      await signin(data);
+      setSignInSuccess(true);
+    } catch (error) {
+      if (error.response) {
+        // server responded with a status code that falls out of the range of 2xx
+        setAlert({ text: error.response.data, type: ERROR_ALERT, title: "Error" });
+      } else if (error.request) {
+        // The request was made but no response was received
+        console.log(error.request);
+        setAlert({
+          text: "Are you online? We weren't able to connect to the server",
+          type: ERROR_ALERT,
+          title: "Error"
+        });
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        setAlert({
+          text: `Something really bad happened: ${error.message}`,
+          type: ERROR_ALERT,
+          title: "Error"
+        });
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (signInSuccess) {
+      history.push("/dashboard");
+    }
+  }, [signInSuccess]);
+
+  const clearAlert = () => {
+    setAlert(null);
+  };
+
+  return (
+    <div className={classes.root}>
+      {alert && (
+        <AlertDialog
+          onClose={clearAlert}
+          show={true}
+          title={alert.title}
+          text={alert.text}
+          type={alert.type}
+        />
+      )}
+      <Avatar className={classes.avatar}>
+        <LockOutlinedIcon />
+      </Avatar>
+      <Typography className={classes.title} component="h1" variant="h3">
+        Sign in
+      </Typography>
+      <form className={classes.form} noValidate onSubmit={handleSubmit(onSubmit)}>
+        <TextField
+          variant="outlined"
+          margin="normal"
+          fullWidth
+          label="Nick name"
+          name="nickname"
+          inputRef={register({})}
+          autoComplete="nick"
+          autoFocus
+        />
+
+        <TextField
+          variant="outlined"
+          margin="normal"
+          fullWidth
+          inputRef={register({})}
+          name="password"
+          label="Password"
+          type="password"
+          id="password"
+          autoComplete="current-password"
+        />
+        {/* <FormControlLabel
                     control={<Checkbox value="remember" color="primary" />}
                     label="Remember me"
-                />
-                <Button
-                    type="submit"
-                    fullWidth
-                    variant="contained"
-                    color="primary"
-                    className={classes.submit}
-                >
-                    Sign In
-                </Button>
-                <Grid container justify="center" className={classes.bottomGrid}>
-                    {/* <Grid item xs>
+                /> */}
+        <Button type="submit" fullWidth variant="contained" color="primary" className={classes.submit}>
+          Sign In
+        </Button>
+        <Grid container justify="center" className={classes.bottomGrid}>
+          {/* <Grid item xs>
                         <Link href="#" variant="body2">
                             Forgot password?
                         </Link>
                     </Grid> */}
-                    <Grid item>
-                        <Link component={SignUpLink} >
-                            {"Don't have an account? Sign Up"}
-                        </Link>
-                    </Grid>
-                </Grid>
-            </form>
-        </div>
-    );
+          <Grid item>
+            <Link component={SignUpLink}>{"Don't have an account? Sign Up"}</Link>
+          </Grid>
+        </Grid>
+      </form>
+    </div>
+  );
 }
 
 export default SignIn;
