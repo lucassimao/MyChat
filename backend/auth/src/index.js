@@ -10,7 +10,7 @@ db.connect()
 
     app.set("trust proxy", 1);
 
-    app.use(cors());
+    app.use(cors({exposedHeaders: 'authorization'}));
     app.use("/", rootRouter);
     app.listen(config.port);
 
