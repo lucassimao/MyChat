@@ -86,7 +86,6 @@ function SignIn(props) {
       {alert && (
         <AlertDialog
           onClose={clearAlert}
-          show={true}
           title={alert.title}
           text={alert.text}
           type={alert.type}

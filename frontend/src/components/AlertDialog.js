@@ -20,8 +20,8 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 export default function AlertDialog(props) {
-  const { show, title, text, type, onClose } = props;
-  const [open, setOpen] = useState(show);
+  const { title, text, type, onClose } = props;
+  const [open, setOpen] = useState(true);
 
   const handleClose = () => {
     setOpen(false);
@@ -58,9 +58,8 @@ export default function AlertDialog(props) {
 }
 
 AlertDialog.propTypes = {
-  title: props.string,
-  text: props.string,
-  type: props.number,
-  show: props.bool,
+  title: props.string.isRequired,
+  text: props.string.isRequired,
+  type: props.number.isRequired,
   onClose: props.func
 };
