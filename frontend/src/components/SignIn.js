@@ -9,7 +9,7 @@ import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import React, { useEffect, useState } from "react";
 import useForm from "react-hook-form";
 import { Link as RouterLink, useHistory } from "react-router-dom";
-import { signin } from "../services/SignInService";
+import signInService from "../services/SignInService";
 import AlertDialog, { ERROR_ALERT } from "./AlertDialog";
 
 const useStyles = makeStyles(theme => ({
@@ -43,10 +43,10 @@ function SignIn(props) {
   const [alert, setAlert] = useState();
   const history = useHistory();
 
-
   const onSubmit = async data => {
     try {
-      await signin(data);
+      const response = await signInService.signin(data);
+      signInService.storeCredentials({...data, authorizationToken: response.headers.authorization});
       setSignInSuccess(true);
     } catch (error) {
       if (error.response) {
@@ -75,6 +75,7 @@ function SignIn(props) {
     if (signInSuccess) {
       history.push("/dashboard");
     }
+    // eslint-disable-next-line
   }, [signInSuccess]);
 
   const clearAlert = () => {
@@ -83,14 +84,7 @@ function SignIn(props) {
 
   return (
     <div className={classes.root}>
-      {alert && (
-        <AlertDialog
-          onClose={clearAlert}
-          title={alert.title}
-          text={alert.text}
-          type={alert.type}
-        />
-      )}
+      {alert && <AlertDialog onClose={clearAlert} title={alert.title} text={alert.text} type={alert.type} />}
       <Avatar className={classes.avatar}>
         <LockOutlinedIcon />
       </Avatar>
