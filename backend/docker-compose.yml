@@ -1,0 +1,19 @@
+version: '3'
+volumes:
+  db_data:
+services:
+  auth:
+    depends_on: 
+      - db
+    build:
+      context: auth/
+      args:
+        JWT_SECRET_KEY: 12345
+        MONGO_DB_URL: mongodb://db:27017/mychat
+        HTTP_PORT: 3000
+    ports: 
+      - "3001:3000" 
+  db:
+    image: mongo:4.2 
+    # volumes:
+      # - db_data:/data/db

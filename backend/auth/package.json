@@ -1,0 +1,38 @@
+{
+  "name": "auth",
+  "version": "0.0.1",
+  "description": "Decorebator authentication endpoint",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "lint": "eslint 'src/**/*.js'",
+    "test": "jest --detectOpenHandles 'src/'",
+    "format": "prettier --write 'src/**/*.js'",
+    "jest-watch": "jest --watch --detectOpenHandles 'src/'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/lucassimao/decorebator-app.git"
+  },
+  "author": "Lucas Simao",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lucassimao/decorebator-app/issues"
+  },
+  "homepage": "https://github.com/lucassimao/decorebator-app#readme",
+  "dependencies": {
+    "bcrypt": "^3.0.6",
+    "express": "^4.17.1",
+    "jwt-builder": "^1.1.0",
+    "mongoose": "^5.7.5",
+    "passport": "^0.4.0",
+    "passport-jwt": "^4.0.0",
+    "validator": "^11.1.0"
+  },
+  "devDependencies": {
+    "eslint": "^6.5.1",
+    "eslint-plugin-jest": "^22.19.0",
+    "prettier": "^1.18.2",
+    "supertest": "^4.0.2"
+  }
+}
