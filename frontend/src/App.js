@@ -7,6 +7,8 @@ import SignIn from './components/SignIn';
 
 const SignUp = React.lazy(() => import('./components/SignUp'));
 const Dashboard = React.lazy(() => import('./components/Dashboard'));
+const ChatRoom = React.lazy(() => import('./components/ChatRoom'));
+const Fallback  = <div>Loading ...</div>
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -24,17 +26,22 @@ function App() {
     <Router>
       <Switch>
         <Route path="/signup">
-          <Suspense fallback={<div> Loading ...</div>}>
+          <Suspense fallback={Fallback}>
             <Container className={classes.root} component="main" maxWidth="xs">
               <SignUp />
             </Container>
           </Suspense>
         </Route>
         <Route path="/dashboard">
-          <Suspense fallback={<div> Loading ...</div>}>
+          <Suspense fallback={Fallback}>
             <Dashboard />
           </Suspense>
         </Route>
+        <Route path="/chatroom">
+          <Suspense fallback={Fallback}>
+            <ChatRoom />
+          </Suspense>
+        </Route>        
         <Route path="/">
           <Container className={classes.root} component="main" maxWidth="xs">
             <SignIn />
