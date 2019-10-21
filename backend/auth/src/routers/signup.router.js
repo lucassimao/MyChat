@@ -16,18 +16,16 @@ router.post("/signup", express.json(), async (req, res, next) => {
         }
         if (error.code === 11000 && "nickname" in error.keyPattern) {
           res.status(400).send("Nickname has been already taken");
-        }        
+        }
         break;
       case "ValidationError":
         res.status(400);
 
         if ("email" in error.errors) {
           res.send(error.errors.email.message);
-        }
-        else if ("nickname" in error.errors) {
+        } else if ("nickname" in error.errors) {
           res.send(error.errors.nickname.message);
-        }
-        else {
+        } else {
           res.send(error.message);
         }
         break;
