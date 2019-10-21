@@ -8,6 +8,14 @@ const wrapAsync = asyncMiddleware => {
 
 router
   .get(
+    "/mine",
+    wrapAsync(async (req, res) => {
+      const { page = 0 } = req.query;
+      const chatrooms = await service.list({ page }, req.user);
+      res.status(200).send({ chatrooms });
+    })
+  )
+  .get(
     "/",
     wrapAsync(async (req, res) => {
       const { page = 0 } = req.query;

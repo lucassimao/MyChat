@@ -8,12 +8,16 @@ const ChatroomDao = require("../dao/chatroom.dao");
  *
  * @param {number} pageSize The amount of chatrooms to be returned
  * @param {number} page As the data set is seen as a set of pages, this param represents the requested page
- *
+ * @param {object} user The authenticated user
+ * @param {mongoose.Types.ObjectId} user._id The user id
+ * 
  * @returns {Promise} A promise, which resolves to an array of chatrooms
  */
-const list = ({ pageSize = config.defaultPageSize, page = 0 }) => {
+const list = ({ pageSize = config.defaultPageSize, page = 0 }, user) => {
   const skip = page > 0 ? page * pageSize : 0;
-  return ChatroomDao.find({}, null, { limit: pageSize, skip }).sort({'dateCreated':'desc'})
+  let query = user ? {owner: user._id} : {};
+
+  return ChatroomDao.find(query, null, { limit: pageSize, skip }).sort({'dateCreated':'desc'})
 };
 
 /**
