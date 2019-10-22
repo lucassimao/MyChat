@@ -75,7 +75,7 @@ function NewChatRoom(props) {
     try {
       data.base64EncodedImage = imgRef.current.src;
       await chatRoomService.registerNewChatroom(data);
-      setAlert({ text: "Your new rooms is ready to be used", type: INFORMATION_ALERT, title: "Success" });
+      setAlert({ text: "Your new room is ready to be used", type: INFORMATION_ALERT, title: "Success" });
       setCloseWindow(true);
     } catch (error) {
       if (error.response) {
