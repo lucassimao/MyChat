@@ -39,7 +39,7 @@ const useStyles = makeStyles(theme => ({
 
 function ChatRoomWidget(props) {
   const classes = useStyles();
-  const { title, subheader, content, image, onDelete, onJoin, participants } = props;
+  const { title, subheader, content, image, onDelete, onJoin, participants = 0 } = props;
 
   return (
     <Card className={classes.card}>
@@ -51,7 +51,7 @@ function ChatRoomWidget(props) {
             {title}
           </Typography>
           <Typography variant="body2" color="textSecondary" component="p">
-            {content}
+            {content} - {subheader}
           </Typography>
         </CardContent>
       </CardActionArea>

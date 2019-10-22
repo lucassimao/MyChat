@@ -12,7 +12,9 @@ import DashboardToolbar from "./DashboardToolbar";
 import PrivateHOC from "./PrivateHOC";
 import chatRoomService from "../services/ChatroomService";
 import AlertDialog, { ERROR_ALERT, INFORMATION_ALERT } from "./AlertDialog";
-
+import {
+  useHistory
+} from "react-router-dom";
 const useStyles = makeStyles(theme => ({
   root: {
     flexGrow: 1
@@ -35,6 +37,7 @@ function Dashboard() {
   const [roomsByLoggedInUser, setRoomsByLoggedInUser] = useState([]);
   const [roomsByOtherUsers, setRoomsByOtherUsers] = useState([]);
   const [alert, setAlert] = useState();
+  const history = useHistory();
 
   const clearAlert = () => {
     setAlert(null);
@@ -63,6 +66,32 @@ function Dashboard() {
     }
     loadChatRooms();
   }, []);
+
+  const joinRoom = async roomId => {
+    try {
+      await chatRoomService.joinChatRoom(roomId);
+      history.push(`/chatroom/${roomId}`);
+    } catch (error) {
+      if (error.response) {
+        // server responded with a status code that falls out of the range of 2xx
+        setAlert({ text: error.response.data, type: ERROR_ALERT, title: "Error" });
+      } else if (error.request) {
+        // The request was made but no response was received
+        setAlert({
+          text: "Are you online? We weren't able to connect to the server",
+          type: ERROR_ALERT,
+          title: "Error"
+        });
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        setAlert({
+          text: `Something really bad happened: ${error.message}`,
+          type: ERROR_ALERT,
+          title: "Error"
+        });
+      }
+    }
+  };
 
   const deleteRoom = async roomId => {
     try {
@@ -109,8 +138,10 @@ function Dashboard() {
               <Grid key={idx} item xs={12} sm={6} md={3} xl={2}>
                 <ChatRoomWidget
                   image={chatRoom.pic}
+                  participants={chatRoom.participants.length}
                   title={chatRoom.name}
                   onDelete={() => deleteRoom(chatRoom._id)}
+                  onJoin={() => joinRoom(chatRoom._id)}
                   content={chatRoom.description}
                   subheader={new Date(chatRoom.dateCreated).toLocaleDateString()}
                 />
@@ -129,8 +160,9 @@ function Dashboard() {
               <Grid key={idx} item xs={12} sm={6} md={3} xl={2}>
                 <ChatRoomWidget
                   image={chatRoom.pic}
+                  participants={chatRoom.participants.length}
                   title={chatRoom.name}
-                  roomId={chatRoom._id}
+                  onJoin={() => joinRoom(chatRoom._id)}
                   content={chatRoom.description}
                   subheader={new Date(chatRoom.dateCreated).toLocaleDateString()}
                 />

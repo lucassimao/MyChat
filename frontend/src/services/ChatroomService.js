@@ -31,9 +31,14 @@ async function deleteRoom(roomId) {
   return axiosInstance.delete("/" + roomId);
 }
 
+async function joinChatRoom(roomId){
+    return axiosInstance.patch(`${roomId}/join`)
+}
+
 export default {
   getOthersChatrooms,
   getChatRoomsCreatedByLoggedInUser,
   registerNewChatroom,
-  deleteRoom
+  deleteRoom,
+  joinChatRoom
 };

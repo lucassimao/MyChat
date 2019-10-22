@@ -14,7 +14,9 @@ import ListItemText from '@material-ui/core/ListItemText';
 import Avatar from '@material-ui/core/Avatar';
 import { red } from '@material-ui/core/colors';
 import { Grid } from '@material-ui/core';
-
+import {
+  useParams
+} from "react-router-dom";
 import Divider from '@material-ui/core/Divider';
 
 
@@ -122,6 +124,7 @@ export default function ChatRoom(props) {
     const bottomBarRef = useRef();
     const msgListRef = useRef();
     const onlineUsersListRef = useRef();
+    const {roomId} = useParams();
 
 
     const handleUserTyping = (evt) => setMessage(evt.target.value);

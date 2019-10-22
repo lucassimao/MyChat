@@ -39,7 +39,7 @@ function App() {
             <Dashboard />
           </Suspense>
         </Route>
-        <Route path="/chatroom">
+        <Route path="/chatroom/:roomId">
           <Suspense fallback={Fallback}>
             <ChatRoom />
           </Suspense>

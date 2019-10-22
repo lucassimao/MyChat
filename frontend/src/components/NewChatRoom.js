@@ -114,7 +114,7 @@ function NewChatRoom(props) {
           </Typography>
         </Toolbar>
       </AppBar>
-      <Container className={classes.container}>
+      <Container className={classes.container} maxWidth="sm">
         <form onSubmit={handleSubmit(signup)} noValidate>
           <Grid container spacing={2}>
             <Grid item xs={12}>
@@ -141,6 +141,9 @@ function NewChatRoom(props) {
               />
             </Grid>
             <Grid style={{ display: "flex", alignItems: "center", flexDirection: "column" }} item xs={12}>
+                <Typography component="h6">
+                    Choose a banner for your room
+                </Typography>
               <img
                 alt="chat room theme"
                 style={{ maxWidth: "100%" }}
