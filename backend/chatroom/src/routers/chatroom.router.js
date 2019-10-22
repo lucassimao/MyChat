@@ -36,7 +36,7 @@ router
   )
   .post(
     "/",
-    express.json(),
+    express.json({limit: '10mb'}),
     wrapAsync(async (req, res) => {
       try {
         let chatroom = req.body;
