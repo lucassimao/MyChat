@@ -101,6 +101,7 @@ export default function SignUp(props) {
           type={alert.type}
         />
       )}
+      
       <Avatar className={classes.avatar}>
         <LockOutlinedIcon />
       </Avatar>
