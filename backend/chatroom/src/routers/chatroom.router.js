@@ -27,14 +27,6 @@ router
       res.status(200).send({ chatrooms });
     })
   )
-  .get(
-    "/",
-    wrapAsync(async (req, res) => {
-      const { page = 0 } = req.query;
-      const chatrooms = await service.list({ page });
-      res.status(200).send({ chatrooms });
-    })
-  )
   .post(
     "/",
     express.json({ limit: "10mb" }),
@@ -76,17 +68,15 @@ router
     })
   )
   .patch(
-    "/:id",
-    express.json(),
-    wrapAsync(async (req, res, next) => {
-      const updateResult = await service.update(req.params.id, req.body, req.user);
-
-      if (updateResult.ok === 1 && updateResult.nModified === 1) {
-        res.set("Link", `/chatrooms/${req.params.id}`);
-        res.status(204).end();
-      } else {
-        next();
-      }
+    "/:roomId/join",
+    wrapAsync(async (req, res) => {
+        const chatroom = await service.getById(req.params.roomId);
+        if (chatroom){
+            await service.joinRoom(chatroom,req.user);
+            res.sendStatus(204);
+        } else {
+            res.status(404).send('Chat room not found');
+        }
     })
   );
 

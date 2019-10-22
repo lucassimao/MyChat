@@ -60,6 +60,19 @@ const save = (chatroom, user) => {
 };
 
 /**
+ * Join a chatroom
+ *
+ * @param {object} chatroom the chatroom the user wants to join
+ * @param {object} user The authenticated user, owner of the new chatroom
+ * @param {mongoose.Types.ObjectId} user._id The user id
+ *
+ * @returns {boolean} If the was possible to join the chatroom 
+ */
+const joinRoom = (chatroom, user) => {
+  return ChatroomDao.updateOne({ _id: chatroom._id}, {'$addToSet': {participants : user._id}});
+};
+
+/**
  * Updates a existing chatroom
  *
  * @param {string|mongoose.Types.ObjectId} id The id of the object to be updated
@@ -85,13 +98,26 @@ const remove = (id, user) => {
   return ChatroomDao.deleteOne({ _id: id, owner: user._id });
 };
 
+/**
+ * retrieves a chatroom by id
+ *
+ * @param {string|mongoose.Types.ObjectId} id The id of the object to be read
+ *
+ * @returns {Promise} A promise, which resolves to the chatroom object
+ */
+const getById = (id) => {
+  return ChatroomDao.findById(id);
+};
+
 const api = {
   list,
   listByUser,
   listByUserOtherThan,
   save,
   update,
-  delete: remove
+  delete: remove,
+  joinRoom,
+  getById
 };
 
 
