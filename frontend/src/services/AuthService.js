@@ -12,6 +12,18 @@ async function signin({ nickname, password }) {
   });
 }
 
+async function signup({ nickname, email, password }) {
+  return axios({
+    method: "post",
+    url: config.signUpUrl,
+    data: {
+      nickname,
+      email,
+      password
+    }
+  });
+}
+
 function storeCredentials({ nickname, authorizationToken }) {
   localStorage.setItem("token", authorizationToken);
   localStorage.setItem("nickname", nickname);
@@ -36,5 +48,6 @@ export default {
   storeCredentials,
   getToken,
   logOff,
-  isLoggedIn
+  isLoggedIn,
+  signup
 }

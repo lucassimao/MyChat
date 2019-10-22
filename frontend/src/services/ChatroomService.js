@@ -1,12 +1,12 @@
 import axios from "axios";
 import config from "../config";
-import signInService from "./SignInService";
+import authService from "./AuthService";
 
 const axiosInstance = axios.create({
   baseURL: config.chatroomUrl,
   headers: {
     common: {
-      authorization: "bearer " + signInService.getToken()
+      authorization: "bearer " + authService.getToken()
     }
   }
 });

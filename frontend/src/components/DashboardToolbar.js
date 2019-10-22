@@ -10,7 +10,7 @@ import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import SearchIcon from '@material-ui/icons/Search';
 import React from 'react';
 import { useHistory } from "react-router-dom";
-import signInService from '../services/SignInService';
+import authService from '../services/AuthService';
 import { Link as RouterLink } from "react-router-dom";
 
 
@@ -69,7 +69,7 @@ export default function DashboardToolbar(props) {
 
 
     const logoff = () => {
-        signInService.logOff();
+        authService.logOff();
         history.push('/');
     }
 

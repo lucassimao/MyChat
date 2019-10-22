@@ -9,7 +9,7 @@ import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import React, { useState } from "react";
 import useForm from "react-hook-form";
 import { Link as RouterLink } from "react-router-dom";
-import { signup } from "../services/SignUpService";
+import authService from "../services/AuthService";
 import AlertDialog, { INFORMATION_ALERT, ERROR_ALERT } from "./AlertDialog";
 import { useHistory } from "react-router-dom";
 
@@ -45,7 +45,7 @@ export default function SignUp(props) {
 
   const onSubmit = async data => {
     try {
-      await signup(data);
+      await authService.signup(data);
       setAlert({
         text: "Your account was successfully created! You're all set to login",
         type: INFORMATION_ALERT,

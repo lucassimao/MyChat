@@ -9,7 +9,7 @@ import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import React, { useEffect, useState } from "react";
 import useForm from "react-hook-form";
 import { Link as RouterLink, useHistory } from "react-router-dom";
-import signInService from "../services/SignInService";
+import authService from "../services/AuthService";
 import AlertDialog, { ERROR_ALERT } from "./AlertDialog";
 
 const useStyles = makeStyles(theme => ({
@@ -45,8 +45,8 @@ function SignIn(props) {
 
   const onSubmit = async data => {
     try {
-      const response = await signInService.signin(data);
-      signInService.storeCredentials({...data, authorizationToken: response.headers.authorization});
+      const response = await authService.signin(data);
+      authService.storeCredentials({...data, authorizationToken: response.headers.authorization});
       setSignInSuccess(true);
     } catch (error) {
       if (error.response) {
