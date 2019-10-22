@@ -28,6 +28,18 @@ router
     })
   )
   .post(
+    "/:roomId/participants",
+    wrapAsync(async (req, res) => {
+        const chatroom = await service.getById(req.params.roomId);
+        if (chatroom){
+            await service.joinRoom(chatroom,req.user);
+            res.sendStatus(200);
+        } else {
+            res.status(404).send('Chat room not found');
+        }
+    })
+  )
+  .post(
     "/",
     express.json({ limit: "10mb" }),
     wrapAsync(async (req, res) => {
@@ -67,17 +79,6 @@ router
       }
     })
   )
-  .patch(
-    "/:roomId/join",
-    wrapAsync(async (req, res) => {
-        const chatroom = await service.getById(req.params.roomId);
-        if (chatroom){
-            await service.joinRoom(chatroom,req.user);
-            res.sendStatus(204);
-        } else {
-            res.status(404).send('Chat room not found');
-        }
-    })
-  );
+
 
 module.exports = router;

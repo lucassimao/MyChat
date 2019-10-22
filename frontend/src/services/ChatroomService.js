@@ -32,7 +32,7 @@ async function deleteRoom(roomId) {
 }
 
 async function joinChatRoom(roomId){
-    return axiosInstance.patch(`${roomId}/join`)
+    return axiosInstance.post(`${roomId}/participants`)
 }
 
 export default {

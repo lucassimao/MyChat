@@ -61,7 +61,6 @@ function ChatRoomWidget(props) {
         </Button>
 
         <div>
-          <IconButton aria-label={`${participants} participants`}>
             <Badge
               anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
               badgeContent={participants}
@@ -69,7 +68,6 @@ function ChatRoomWidget(props) {
             >
               <PeopleIcon fontSize="large" />
             </Badge>
-          </IconButton>
 
           {onDelete && (
             <IconButton onClick={onDelete} aria-label="delete">
