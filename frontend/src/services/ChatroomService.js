@@ -19,7 +19,12 @@ async function getChatRoomsCreatedByLoggedInUser(){
     return axiosInstance.get('/mine');
 }
 
+async function registerNewChatroom({name, description, base64EncodedImage}) {
+    return axiosInstance.post('/',{name,description,pic : base64EncodedImage},{'content-type':'application/json'})
+}
+
 export default{
     getOthersChatrooms,
-    getChatRoomsCreatedByLoggedInUser
+    getChatRoomsCreatedByLoggedInUser,
+    registerNewChatroom
 }

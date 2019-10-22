@@ -11,6 +11,10 @@ import SearchIcon from '@material-ui/icons/Search';
 import React from 'react';
 import { useHistory } from "react-router-dom";
 import signInService from '../services/SignInService';
+import { Link as RouterLink } from "react-router-dom";
+
+
+const NewChatroomLink = React.forwardRef((props, ref) => <RouterLink to="/newchatroom" innerRef={ref} {...props} />);
 
 const useStyles = makeStyles(theme => ({
     title: {
@@ -97,6 +101,7 @@ export default function DashboardToolbar(props) {
                     aria-label="create new chat room"
                     aria-controls="menu-appbar"
                     color="inherit"
+                    component={NewChatroomLink}
                 >
                     <AddCommentIcon />
                 </IconButton>
@@ -114,8 +119,8 @@ export default function DashboardToolbar(props) {
                 <IconButton
                     aria-label="exit application"
                     aria-controls="menu-appbar"
-                    color="inherit"
                     onClick={logoff}
+                    color="inherit"
                 >
                     <ExitToAppIcon />
                 </IconButton>

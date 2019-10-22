@@ -1,16 +1,15 @@
-import React, { useState } from "react";
-import props from "prop-types";
 import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
-import Slide from "@material-ui/core/Slide";
-import InfoOutlinedIcon from "@material-ui/icons/InfoOutlined";
 import Divider from "@material-ui/core/Divider";
-import { Typography } from "@material-ui/core";
+import Slide from "@material-ui/core/Slide";
 import ErrorOutlineOutlinedIcon from "@material-ui/icons/ErrorOutlineOutlined";
+import InfoOutlinedIcon from "@material-ui/icons/InfoOutlined";
+import props from "prop-types";
+import React, { useState } from "react";
 
 export const INFORMATION_ALERT = 1;
 export const ERROR_ALERT = 2;
@@ -39,12 +38,10 @@ export default function AlertDialog(props) {
     >
       <DialogTitle id="alert-dialog-slide-title">{title}</DialogTitle>
       <DialogContent>
-        <DialogContentText id="alert-dialog-slide-description">
-          <Typography style={{ display: "flex", alignItems:'center' }} component="p">
+        <DialogContentText id="alert-dialog-slide-description" style={{ display: "flex", alignItems:'center' }}>
             {type === INFORMATION_ALERT && <InfoOutlinedIcon  fontSize="large" color="primary" />}
             {type === ERROR_ALERT && <ErrorOutlineOutlinedIcon fontSize="large" color="error" />}
             {text}
-          </Typography>
         </DialogContentText>
       </DialogContent>
       <Divider />
