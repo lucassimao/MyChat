@@ -48,7 +48,11 @@ router
         if (error.name == "ValidationError") {
           res.status(400).send(error.errors);
         } else if (error.name == "MongoError") {
-          res.status(400).send(error);
+            if (error.code === 11000 && error.keyPattern.name){
+                res.status(400).send('The name you chose is already in use, please try a new one');
+            } else {
+                res.status(400).send(error.errmsg);
+            }
         } else {
           throw error;
         }
