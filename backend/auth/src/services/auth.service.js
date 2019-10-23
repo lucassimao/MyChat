@@ -38,7 +38,7 @@ const doLogin = (nickname, password) => {
     return Promise.reject("nickname and password must be provided");
   }
 
-  return UserDao.findOne({ nickname }, "encrypted_password")
+  return UserDao.findOne({ nickname },{encrypted_password:1, favouriteColor:1})
     .exec()
     .then(user => {
       if (!user) {
@@ -60,6 +60,7 @@ const doLogin = (nickname, password) => {
         exp: (60*60*24*365), // 1 year in seconds
         iss: config.domain,
         userId: user._id,
+        favouriteColor: user.favouriteColor,
         claims: {
           role: "user"
         }

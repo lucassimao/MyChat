@@ -38,28 +38,33 @@ function getNickname() {
   return localStorage.getItem('nickname');
 }
 
-function getUserId(){
+function getUserId() {
   const jwtTokenObject = parseJwt(getToken());
   return jwtTokenObject.userId;
+}
+
+function getFavouriteColor() {
+  const jwtTokenObject = parseJwt(getToken());
+  return jwtTokenObject.favouriteColor;
 }
 
 function logOff() {
   localStorage.clear();
 }
 
-function isLoggedIn(){
+function isLoggedIn() {
   const token = getToken();
   return Boolean(token && token.trim());
 }
 
-function parseJwt (token) {
-    var base64Url = token.split('.')[1];
-    var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-    }).join(''));
+function parseJwt(token) {
+  var base64Url = token.split('.')[1];
+  var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+  var jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
+    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+  }).join(''));
 
-    return JSON.parse(jsonPayload);
+  return JSON.parse(jsonPayload);
 };
 
 export default {
@@ -68,6 +73,7 @@ export default {
   getUserId,
   getToken,
   logOff,
+  getFavouriteColor,
   isLoggedIn,
   getNickname,
   signup

@@ -56,7 +56,7 @@ async function getChatRoomInfo(roomId) {
   return axiosInstance.get('/' + roomId);
 }
 
-async function sendMessage({ data = '', roomId, userId, event }) {
+async function sendMessage({ data = '', roomId, userId, event, favouriteColor }) {
   return axios({
     method: "post",
     headers: { 'Content-Type': 'application/vnd.kafka.json.v2+json', 'Accept': 'application/vnd.kafka.v2+json' },
@@ -64,7 +64,7 @@ async function sendMessage({ data = '', roomId, userId, event }) {
     data: {
       records: [
         {
-          value: { data, userId, event }
+          value: { data, userId, event, favouriteColor }
         }
       ]
     }
@@ -85,9 +85,9 @@ function getServerRoomOffset(roomId) {
   }
 }
 
-// function setRoomOffset(roomId, offset) {
-//   localStorage.setItem('offset-' + roomId, offset);
-// }
+function setRoomOffset(roomId, offset) {
+  localStorage.setItem('offset-' + roomId, offset);
+}
 
 async function readMoreMessages(roomId, userId) {
   const url = await getKafkaConsumerUrl(roomId, userId);
@@ -100,11 +100,9 @@ async function readMoreMessages(roomId, userId) {
       url: `${url}/records`,
     });
 
-    response.data.forEach(msg => {
-      msg.isNew = msg.offset > serverRoomOffset;
-    });
+    response.data.forEach(msg => msg.isNew = msg.offset > serverRoomOffset);
+    return response.data;       // [{"key":null,"value":{"foo":"bar"},"partition":0,"offset":0,"topic":"jsontest"}]
 
-    return response.data; // [{"key":null,"value":{"foo":"bar"},"partition":0,"offset":0,"topic":"jsontest"}]
 
   } catch (error) {
     if (error.response && error.response.data.error_code === 40403) {

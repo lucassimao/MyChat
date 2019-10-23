@@ -23,6 +23,7 @@ import chatRoomService from '../services/ChatroomService';
 import authService from '../services/AuthService';
 import PrivateHOC from './PrivateHOC';
 import { useTheme } from '@material-ui/core/styles';
+import clsx from 'clsx';
 
 
 const useStyles = makeStyles(theme => ({
@@ -39,17 +40,24 @@ const useStyles = makeStyles(theme => ({
         maxWidth: '100%',
         overflowX: 'hidden',
         wordBreak: 'break-word',
-
+        padding: theme.spacing(1)
     },
     messagesListEmpty: {
         display: 'flex',
         justifyContent: "center",
         alignItems: "center"
     },
+    message : {
+        border: `1px solid ${theme.palette.secondary.main}`,
+        borderRadius: theme.spacing(2),
+        marginTop: theme.spacing(1),
+        backgroundColor: '#34B7F1',
+    },
     userMessage: {
         display: 'flex',
         flexDirection: 'row-reverse',
-        textAlign: 'right'
+        textAlign: 'right',
+        backgroundColor: ' #DCF8C6',
     },
     onlineUsersList: {
         overflowY: 'auto',
@@ -102,11 +110,10 @@ function ChatRoom(props) {
     const isExtraSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
 
-
     const handleUserTyping = (evt) => setMessage(evt.target.value);
 
     const sendMessage = async () => {
-        await chatRoomService.sendMessage({ roomId, data: message, userId, event: 'message' });
+        await chatRoomService.sendMessage({ roomId, data: message, userId, event: 'message' , favouriteColor : authService.getFavouriteColor() });
         // TODO handle error
         setMessage('');
     }
@@ -267,16 +274,19 @@ function ChatRoom(props) {
                 <Grid item xs={12} sm={8} md={9} lg={10}>
                     <List className={`${classes.messagesList} ${messages == null ? classes.messagesListEmpty : ''}`} ref={msgListRef} >
                         {messages != null ? (
-                            messages.map(({ data: message, userId: authorId, event }, idx) => (
-                                <ListItem className={userId === authorId ? classes.userMessage : ''} key={idx}>
+                            messages.map(({ data: message, userId: authorId, event, favouriteColor }, idx) => (
+
+                                <ListItem className={(userId === authorId) ? `${classes.message} ${classes.userMessage}` : (event=='message' ? `${classes.message}` : '')} key={idx}>
                                     {event === 'message' ? (
                                         <>
                                             <ListItemAvatar >
-                                                <Avatar alt="Profile Picture" className={classes.avatar} />
+                                                {/* showing the avatar with the first letter of the user nick name */}
+                                                <Avatar alt="Profile Picture" style={{backgroundColor: favouriteColor}}
+                                                        className={classes.avatar}>  {authorId[0]} </Avatar> 
                                             </ListItemAvatar>
                                             {/* <ListItemText primary={message} /> */}
-                                            <ListItemText disableTypography={true}>
-                                                <div dangerouslySetInnerHTML={{__html : message}} />
+                                            <ListItemText  primary={authorId + ' says ...'} 
+                                                    secondary={<span dangerouslySetInnerHTML={{__html : message}} />}>
                                             </ListItemText>
                                         </>
                                     ) : (
