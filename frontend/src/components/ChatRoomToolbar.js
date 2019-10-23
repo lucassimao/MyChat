@@ -1,5 +1,4 @@
 import IconButton from '@material-ui/core/IconButton';
-import Link from '@material-ui/core/Link';
 import { fade, makeStyles } from '@material-ui/core/styles';
 import Toolbar from '@material-ui/core/Toolbar';
 import Tooltip from '@material-ui/core/Tooltip';
@@ -8,7 +7,9 @@ import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 
 import QuestionAnswerIcon from '@material-ui/icons/QuestionAnswer';
 import React from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
+import chatRoomService from '../services/ChatroomService';
+
 
 const useStyles = makeStyles(theme => ({
     title: {
@@ -56,17 +57,24 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const DashboardLink = React.forwardRef((props, ref) => <RouterLink to="/dashboard" innerRef={ref} {...props} />);
 
 
 export default function ChatRoomToolbar(props) {
     const classes = useStyles();
+    const { roomName, roomId, userId } = props;
+    const history = useHistory();
+
+    const onExit = async () => {
+        // TODO handle errros
+        await chatRoomService.exitChatRoom(roomId, userId);
+        history.push('/dashboard');
+    }
 
     return (
         <Toolbar>
 
             <Typography variant="h6" className={classes.title}>
-                :: Chat room name ::
+                {` :: ${roomName} ::`}
             </Typography>
 
             <div className={classes.grow} />
@@ -81,13 +89,14 @@ export default function ChatRoomToolbar(props) {
                 </IconButton>
             </Tooltip>
             <Tooltip title="Exit chat room">
-                <Link component={DashboardLink}
+                <IconButton
                     aria-label="exit application"
                     aria-controls="menu-appbar"
                     color="inherit"
+                    onClick={onExit}
                 >
                     <ExitToAppIcon />
-                </Link>
+                </IconButton>
             </Tooltip>
 
         </Toolbar>

@@ -12,6 +12,8 @@ import DashboardToolbar from "./DashboardToolbar";
 import PrivateHOC from "./PrivateHOC";
 import chatRoomService from "../services/ChatroomService";
 import AlertDialog, { ERROR_ALERT, INFORMATION_ALERT } from "./AlertDialog";
+import authService from '../services/AuthService';
+
 import {
   useHistory
 } from "react-router-dom";
@@ -69,7 +71,7 @@ function Dashboard() {
 
   const joinRoom = async roomId => {
     try {
-      await chatRoomService.joinChatRoom(roomId);
+      await chatRoomService.joinChatRoom(roomId,authService.getUserId());
       history.push(`/chatroom/${roomId}`);
     } catch (error) {
       if (error.response) {
