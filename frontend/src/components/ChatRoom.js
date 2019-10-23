@@ -73,7 +73,7 @@ const OnlineUsers = React.forwardRef((props, ref) => {
         {users.map((user, idx) => <React.Fragment key={user._id}>
             <ListItem disableGutters button alignItems="center" >
                 <ListItemAvatar>
-                    <Avatar className={classes.avatar} />
+                    <Avatar className={classes.avatar} style={{backgroundColor: user.favouriteColor}} />
                 </ListItemAvatar>
                 <ListItemText primary={user.nickname} />
             </ListItem>

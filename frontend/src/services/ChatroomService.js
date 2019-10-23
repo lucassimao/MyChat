@@ -47,7 +47,7 @@ async function exitChatRoom(roomId, userId) {
 
   const response = await sendMessage({ event: 'exit', userId, roomId });
   const offset = response.data.offsets.find(p => p.partition === 0).offset;
-  
+
   await axiosInstance.delete(`${roomId}/participants`, { headers: { "content-type": "application/json" }, data: { offset } })
 }
 
@@ -93,24 +93,27 @@ async function readMoreMessages(roomId, userId) {
   const url = await getKafkaConsumerUrl(roomId, userId);
   const serverRoomOffset = getServerRoomOffset(roomId);
 
+  try {
+    const response = await axios({
+      method: "get",
+      headers: { 'Content-Type': 'application/vnd.kafka.json.v2+json', Accept: 'application/vnd.kafka.json.v2+json' },
+      url: `${url}/records`,
+    });
 
-  // TODO handle errors here 
-  const response = await axios({
-    method: "get",
-    headers: { 'Content-Type': 'application/vnd.kafka.json.v2+json', Accept: 'application/vnd.kafka.json.v2+json' },
-    url: `${url}/records`,
-  });
+    response.data.forEach(msg => {
+      msg.isNew = msg.offset > serverRoomOffset;
+    });
 
-  // if (response.data && response.data.length > 0) {
-  //   const maxOffset = response.data[response.data.length - 1].offset;
-  //   setRoomOffset(roomId, maxOffset);
-  // }
+    return response.data; // [{"key":null,"value":{"foo":"bar"},"partition":0,"offset":0,"topic":"jsontest"}]
 
-  response.data.forEach(msg => {
-    msg.isNew = msg.offset > serverRoomOffset;
-  });
+  } catch (error) {
+    if (error.response && error.response.data.error_code === 40403) {
+      const CONSUMER_KEY = `consumer-${roomId}`;
+      localStorage.removeItem(CONSUMER_KEY);
+    }
+    return [];
+  }
 
-  return response.data; // [{"key":null,"value":{"foo":"bar"},"partition":0,"offset":0,"topic":"jsontest"}]
 }
 
 async function getKafkaConsumerUrl(roomId, userId) {

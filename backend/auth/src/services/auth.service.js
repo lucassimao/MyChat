@@ -11,7 +11,7 @@ const config = require("../config");
  *
  * @returns {Promise} Promise to be resolved to the new user registered on the database
  */
-const register = (nickname, email, password) => {
+const register = (nickname, email, password, favouriteColor) => {
   if (isStringEmpty(password)) {
     return Promise.reject("A password must be provided");
   }
@@ -22,7 +22,7 @@ const register = (nickname, email, password) => {
       else resolve(hash);
     });
   }).then(encrypted_password =>
-    UserDao.create({ nickname, email, encrypted_password })
+    UserDao.create({ nickname, email, encrypted_password, favouriteColor })
   );
 };
 

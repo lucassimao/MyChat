@@ -5,6 +5,7 @@ const User = new Schema({
   nickname: String,
   email: String,
   profilePic: String,
+  favouriteColor: String,
   offsets: [{ roomId: { type: String }, value: { type: Number } }]
 });
 

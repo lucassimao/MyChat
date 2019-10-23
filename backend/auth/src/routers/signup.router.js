@@ -4,9 +4,9 @@ const AuthService = require("../services/auth.service");
 const router = express.Router();
 
 router.post("/signup", express.json(), async (req, res, next) => {
-  const { email, password, nickname } = req.body;
+  const { email, password, nickname, favouriteColor } = req.body;
   try {
-    await AuthService.register(nickname, email, password);
+    await AuthService.register(nickname, email, password,favouriteColor);
     res.sendStatus(200);
   } catch (error) {
     switch (error.name) {

@@ -12,14 +12,15 @@ async function signin({ nickname, password }) {
   });
 }
 
-async function signup({ nickname, email, password }) {
+async function signup({ nickname, email, password, favouriteColor }) {
   return axios({
     method: "post",
     url: config.signUpUrl,
     data: {
       nickname,
       email,
-      password
+      password,
+      favouriteColor
     }
   });
 }

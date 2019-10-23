@@ -31,7 +31,7 @@ router
   .get("/:roomId", wrapAsync(async (req, res) => {
     const chatroom = await service.getById(req.params.roomId);
     if (chatroom) {
-      const participants = await UserDao.find({ _id: { $in: chatroom.participants } }, { nickname: 1, profilePic: 1 })
+      const participants = await UserDao.find({ _id: { $in: chatroom.participants } }, { nickname: 1, profilePic: 1, favouriteColor: 1 });
       const { name, description, _id } = chatroom;
       res.status(200).send({ chatroom: { name, description }, participants });
     } else {

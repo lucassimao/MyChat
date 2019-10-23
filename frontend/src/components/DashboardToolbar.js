@@ -80,7 +80,7 @@ export default function DashboardToolbar(props) {
                 MyChat
             </Typography>
 
-            <div className={classes.search}>
+            {/* <div className={classes.search}>
                 <div className={classes.searchIcon}>
                     <SearchIcon />
                 </div>
@@ -92,7 +92,7 @@ export default function DashboardToolbar(props) {
                     }}
                     inputProps={{ 'aria-label': 'search' }}
                 />
-            </div>
+            </div> */}
             <div className={classes.grow} />
 
 
@@ -106,7 +106,7 @@ export default function DashboardToolbar(props) {
                     <AddCommentIcon />
                 </IconButton>
             </Tooltip>
-            <Tooltip title="Your profile">
+            {/* <Tooltip title="Your profile">
                 <IconButton
                     aria-label="your profile"
                     aria-controls="menu-appbar"
@@ -114,7 +114,7 @@ export default function DashboardToolbar(props) {
                 >
                     <AccountCircle />
                 </IconButton>
-            </Tooltip>
+            </Tooltip> */}
             <Tooltip title="Exit application">
                 <IconButton
                     aria-label="exit application"

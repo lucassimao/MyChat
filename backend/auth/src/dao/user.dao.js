@@ -18,6 +18,7 @@ const User = new Schema({
   encrypted_password: { type: String, required: true },
   dateCreated: { type: Date, default: Date.now },
   profilePic: String,
+  favouriteColor:String
 });
 
 module.exports = mongoose.model("User", User);

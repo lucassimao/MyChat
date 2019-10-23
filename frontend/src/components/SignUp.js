@@ -2,6 +2,7 @@ import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
 import Link from "@material-ui/core/Link";
+import InputLabel from '@material-ui/core/InputLabel';
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
@@ -12,6 +13,8 @@ import { Link as RouterLink } from "react-router-dom";
 import authService from "../services/AuthService";
 import AlertDialog, { INFORMATION_ALERT, ERROR_ALERT } from "./AlertDialog";
 import { useHistory } from "react-router-dom";
+import Select from '@material-ui/core/Select';
+import * as colors from '@material-ui/core/colors';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -86,8 +89,8 @@ export default function SignUp(props) {
   };
   const clearAlert = () => {
     setAlert(null);
-    if (signUpSuccess){
-        history.push("/signin");
+    if (signUpSuccess) {
+      history.push("/signin");
     }
   };
 
@@ -101,7 +104,7 @@ export default function SignUp(props) {
           type={alert.type}
         />
       )}
-      
+
       <Avatar className={classes.avatar}>
         <LockOutlinedIcon />
       </Avatar>
@@ -146,6 +149,28 @@ export default function SignUp(props) {
               name="password"
               inputRef={register({ required: true })}
             />
+          </Grid>
+          <Grid item xs={12}>
+            <InputLabel htmlFor="select-helper">Favourite color</InputLabel>
+            <Select
+              fullWidth
+              defaultValue={colors.red[500]}
+              variant="outlined"
+              name="favouriteColor"
+              native={true}
+              inputRef={register({})}
+              inputProps={{
+                id: 'select-helper',
+              }}
+            >
+
+              {
+                Object.keys(colors)
+                      .map(colorName => <option style={{fontWeight:'bold', color: colors[colorName]["500"] }} 
+                                                                key={colorName} 
+                                                                value={colors[colorName]["500"]}>{colorName}</option>)
+              }
+            </Select>
           </Grid>
         </Grid>
         <Button type="submit" fullWidth variant="contained" color="primary" className={classes.submit}>
