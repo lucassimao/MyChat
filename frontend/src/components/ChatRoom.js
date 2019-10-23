@@ -147,16 +147,12 @@ function ChatRoom(props) {
             const results = await chatRoomService.readMoreMessages(roomId, userId);
             let newMessages = results
                 .filter(({ value: msg }) => {
-
-
-                    if (msg.event === 'message' || msg.event !== 'typing') {
+                    if (msg.event === 'message' || (msg.event !== 'typing' && msg.userId !== userId)) {
                         return true;
                     } else {
 
-                        if (msg.userId !== userId) {
-                            if (msg.event == 'typing') {
-                                setStatusMessagePool((sm) => [...sm, `user ${msg.userId} is typing ...`]);
-                            }
+                        if (msg.event == 'typing' && msg.userId !== userId) {
+                            setStatusMessagePool((sm) => [...sm, `user ${msg.userId} is typing ...`]);
                         }
                         return false;
                     }
@@ -252,12 +248,18 @@ function ChatRoom(props) {
                 <Grid item xs={12} sm={8} md={9} lg={10}>
                     <List className={`${classes.messagesList} ${messages == null ? classes.messagesListEmpty : ''}`} ref={msgListRef} >
                         {messages != null ? (
-                            messages.map(({ data: message, userId: authorId }, idx) => (
+                            messages.map(({ data: message, userId: authorId, event }, idx) => (
                                 <ListItem className={userId == authorId ? classes.userMessage : ''} key={idx}>
-                                    <ListItemAvatar >
-                                        <Avatar alt="Profile Picture" className={classes.avatar} />
-                                    </ListItemAvatar>
-                                    <ListItemText secondary={message} />
+                                    {event == 'message' ? (
+                                        <>
+                                            <ListItemAvatar >
+                                                <Avatar alt="Profile Picture" className={classes.avatar} />
+                                            </ListItemAvatar>
+                                            <ListItemText primary={message} />
+                                        </>
+                                    ) : (
+                                            <ListItemText secondary={message} />
+                                        )}
                                 </ListItem>
                             ))
                         ) : (

@@ -71,7 +71,7 @@ function Dashboard() {
 
   const joinRoom = async roomId => {
     try {
-      await chatRoomService.joinChatRoom(roomId,authService.getUserId());
+      await chatRoomService.joinChatRoom(roomId,authService.getNickname());
       history.push(`/chatroom/${roomId}`);
     } catch (error) {
       if (error.response) {
