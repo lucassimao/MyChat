@@ -87,6 +87,8 @@ const OnlineUsers = React.forwardRef((props, ref) => {
 function ChatRoom(props) {
     const classes = useStyles();
     const [message, setMessage] = useState('');
+    const [statusMessagePool, setStatusMessagePool] = useState([]);
+    const [statusMessage, setStatusMessage] = useState([]);
     const [onlineUsers, setOnlineUsers] = useState(null);
     const [messages, setMessages] = useState(null);
     const [roomInfo, setRoomInfo] = useState({});
@@ -95,7 +97,7 @@ function ChatRoom(props) {
     const msgListRef = useRef();
     const onlineUsersGridRef = useRef();
     const { roomId } = useParams();
-    const userId = authService.getUserId();
+    const userId = authService.getNickname();
     const theme = useTheme();
     const isExtraSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -109,12 +111,34 @@ function ChatRoom(props) {
         setMessage('');
     }
 
-    const onInputKeyDown = (evt) => {
+    const onInputKeyDown = async (evt) => {
         if (evt.keyCode === 13) {
             sendMessage();
             evt.preventDefault();
+        } else {
+            if (evt.keyCode !== 18)
+                await chatRoomService.sendMessage({ roomId, userId, event: 'typing' });
         }
     }
+
+    // updates the status message
+    useEffect(() => {
+
+        let interval = setInterval(() => {
+
+            if (statusMessagePool && statusMessagePool.length > 0) {
+                const msg = statusMessagePool[0];
+                setStatusMessage(msg);
+                setStatusMessagePool((smp) => smp.filter(m => m !== msg));
+            } else {
+                setStatusMessage('');
+            }
+
+        }, 1000);
+
+        return () => clearInterval(interval);
+
+    }, [statusMessagePool]);
 
     // pulling messages
     useEffect(() => {
@@ -122,7 +146,22 @@ function ChatRoom(props) {
         const interval = setInterval(async () => {
             const results = await chatRoomService.readMoreMessages(roomId, userId);
             let newMessages = results
-                .filter(({ value: msg }) => msg.event === 'message' || (msg.event !== 'message' && msg.userId !== userId))
+                .filter(({ value: msg }) => {
+
+
+                    if (msg.event === 'message' || msg.event !== 'typing') {
+                        return true;
+                    } else {
+
+                        if (msg.userId !== userId) {
+                            if (msg.event == 'typing') {
+                                setStatusMessagePool((sm) => [...sm, `user ${msg.userId} is typing ...`]);
+                            }
+                        }
+                        return false;
+                    }
+
+                })
                 .map(({ value: msg }) => {
 
                     switch (msg.event) {
@@ -138,7 +177,7 @@ function ChatRoom(props) {
                     }
                 })
 
-                setMessages((currentMessages) => currentMessages ? [...currentMessages, ...newMessages] : newMessages);
+            setMessages((currentMessages) => currentMessages ? [...currentMessages, ...newMessages] : newMessages);
         }, 1000);
 
         return () => clearInterval(interval);
@@ -192,7 +231,7 @@ function ChatRoom(props) {
     return (
         <div className={classes.root}>
             <AppBar ref={topBarRef} position="static">
-                <ChatRoomToolbar roomId={roomId} userId={userId} roomName={roomInfo.name} />
+                <ChatRoomToolbar roomId={roomId} userId={userId} statusMessage={statusMessage} roomName={roomInfo.name} />
             </AppBar>
 
             <Grid container className={classes.grid}>
@@ -211,8 +250,8 @@ function ChatRoom(props) {
 
                 {/* List of messages */}
                 <Grid item xs={12} sm={8} md={9} lg={10}>
-                    <List className={ `${classes.messagesList} ${messages==null ? classes.messagesListEmpty : ''}`} ref={msgListRef} >
-                        {messages!=null ? (
+                    <List className={`${classes.messagesList} ${messages == null ? classes.messagesListEmpty : ''}`} ref={msgListRef} >
+                        {messages != null ? (
                             messages.map(({ data: message, userId: authorId }, idx) => (
                                 <ListItem className={userId == authorId ? classes.userMessage : ''} key={idx}>
                                     <ListItemAvatar >

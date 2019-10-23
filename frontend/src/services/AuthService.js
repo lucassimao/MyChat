@@ -33,6 +33,10 @@ function getToken() {
   return localStorage.getItem('token');
 }
 
+function getNickname() {
+  return localStorage.getItem('nickname');
+}
+
 function getUserId(){
   const jwtTokenObject = parseJwt(getToken());
   return jwtTokenObject.userId;
@@ -64,5 +68,6 @@ export default {
   getToken,
   logOff,
   isLoggedIn,
+  getNickname,
   signup
 }

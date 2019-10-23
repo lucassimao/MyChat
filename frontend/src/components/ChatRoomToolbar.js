@@ -61,7 +61,7 @@ const useStyles = makeStyles(theme => ({
 
 export default function ChatRoomToolbar(props) {
     const classes = useStyles();
-    const { roomName, roomId, userId } = props;
+    const { roomName, roomId, userId, statusMessage } = props;
     const history = useHistory();
 
     const onExit = async () => {
@@ -73,9 +73,12 @@ export default function ChatRoomToolbar(props) {
     return (
         <Toolbar>
 
-            <Typography variant="h6" className={classes.title}>
-                {` :: ${roomName} ::`}
-            </Typography>
+            <div>
+                <Typography variant="h6" className={classes.title}>
+                    {` :: ${roomName} ::`}
+                </Typography>
+                {statusMessage}
+            </div>
 
             <div className={classes.grow} />
 
