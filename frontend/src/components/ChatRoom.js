@@ -146,12 +146,17 @@ function ChatRoom(props) {
         const interval = setInterval(async () => {
             const results = await chatRoomService.readMoreMessages(roomId, userId);
             let newMessages = results
-                .filter(({ value: msg }) => {
+                .filter((data) => {
+                    const msg = data.value;
+
+                    if (msg.event !== 'message' && !data.isNew)
+                        return false;
+
                     if (msg.event === 'message' || (msg.event !== 'typing' && msg.userId !== userId)) {
                         return true;
                     } else {
 
-                        if (msg.event == 'typing' && msg.userId !== userId) {
+                        if (msg.event === 'typing' && msg.userId !== userId) {
                             setStatusMessagePool((sm) => [...sm, `user ${msg.userId} is typing ...`]);
                         }
                         return false;
@@ -164,23 +169,38 @@ function ChatRoom(props) {
                         case 'message':
                             return msg;
                         case 'join':
+                            setOnlineUsers(null);
                             return { ...msg, data: `user ${msg.userId} joined ...` }
                         case 'exit':
-                            // setOnlineUsers(onlineUsers.filter(u => u._id !== msg.userId))
+                            setOnlineUsers(null);
                             return { ...msg, data: `user ${msg.userId} exited ...` }
                         default:
                             throw Error('Unknown message type: ' + msg.event);
                     }
                 })
 
-            setMessages((currentMessages) => currentMessages ? [...currentMessages, ...newMessages] : newMessages);
+
+            setMessages((currentMessages) => {
+                if (currentMessages == null) {
+                    return newMessages
+                } else if (newMessages.length === 0) {
+                    return currentMessages
+                } else {
+                    return [...currentMessages, ...newMessages];
+                }
+            });
+
         }, 1000);
 
         return () => clearInterval(interval);
+        // eslint-disable-next-line
     }, []);
 
     // loading the chatroom details
     useEffect(() => {
+
+        if (onlineUsers != null)
+            return;
 
         (async function load() {
             try {
@@ -192,9 +212,10 @@ function ChatRoom(props) {
                 console.log(error);
                 alert(error)
             }
-        })(roomId)
+        })(roomId);
 
-    }, []);
+        // eslint-disable-next-line
+    }, [onlineUsers]);
 
     // set focus on the newest message received
     useEffect(() => {
@@ -242,23 +263,24 @@ function ChatRoom(props) {
                     </Grid>
                 )}
 
-
-
                 {/* List of messages */}
                 <Grid item xs={12} sm={8} md={9} lg={10}>
                     <List className={`${classes.messagesList} ${messages == null ? classes.messagesListEmpty : ''}`} ref={msgListRef} >
                         {messages != null ? (
                             messages.map(({ data: message, userId: authorId, event }, idx) => (
-                                <ListItem className={userId == authorId ? classes.userMessage : ''} key={idx}>
-                                    {event == 'message' ? (
+                                <ListItem className={userId === authorId ? classes.userMessage : ''} key={idx}>
+                                    {event === 'message' ? (
                                         <>
                                             <ListItemAvatar >
                                                 <Avatar alt="Profile Picture" className={classes.avatar} />
                                             </ListItemAvatar>
-                                            <ListItemText primary={message} />
+                                            {/* <ListItemText primary={message} /> */}
+                                            <ListItemText disableTypography={true}>
+                                                <div dangerouslySetInnerHTML={{__html : message}} />
+                                            </ListItemText>
                                         </>
                                     ) : (
-                                            <ListItemText secondary={message} />
+                                            <ListItemText  secondary={message} />
                                         )}
                                 </ListItem>
                             ))

@@ -31,20 +31,24 @@ async function deleteRoom(roomId) {
 }
 
 async function joinChatRoom(roomId, userId) {
-  await axiosInstance.post(`${roomId}/participants`);
+  // TODO handle error
+  const response = await axiosInstance.post(`${roomId}/participants`);
+  setServerRoomOffset(roomId, response.data.value);
   await sendMessage({ event: 'join', userId, roomId });
 }
 
 async function exitChatRoom(roomId, userId) {
   const url = await getKafkaConsumerUrl(roomId, userId);
 
-
   // TODO handle errors here 
   const CONSUMER_KEY = `consumer-${roomId}`;
-  await sendMessage({ event: 'exit', userId, roomId });
   await axios.delete(url, { headers: { 'Content-Type': 'application/vnd.kafka.v2+json' }, data: { hack: 1 } });
   localStorage.removeItem(CONSUMER_KEY);
-  await axiosInstance.delete(`${roomId}/participants`)
+
+  const response = await sendMessage({ event: 'exit', userId, roomId });
+  const offset = response.data.offsets.find(p => p.partition === 0).offset;
+  
+  await axiosInstance.delete(`${roomId}/participants`, { headers: { "content-type": "application/json" }, data: { offset } })
 }
 
 
@@ -67,8 +71,27 @@ async function sendMessage({ data = '', roomId, userId, event }) {
   });
 }
 
+function setServerRoomOffset(roomId, offset) {
+  localStorage.setItem('server-offset-' + roomId, offset);
+}
+
+
+function getServerRoomOffset(roomId) {
+  const value = localStorage.getItem('server-offset-' + roomId);
+  if (value) {
+    return parseInt(value, 10);
+  } else {
+    return 0;
+  }
+}
+
+// function setRoomOffset(roomId, offset) {
+//   localStorage.setItem('offset-' + roomId, offset);
+// }
+
 async function readMoreMessages(roomId, userId) {
   const url = await getKafkaConsumerUrl(roomId, userId);
+  const serverRoomOffset = getServerRoomOffset(roomId);
 
 
   // TODO handle errors here 
@@ -78,8 +101,16 @@ async function readMoreMessages(roomId, userId) {
     url: `${url}/records`,
   });
 
+  // if (response.data && response.data.length > 0) {
+  //   const maxOffset = response.data[response.data.length - 1].offset;
+  //   setRoomOffset(roomId, maxOffset);
+  // }
 
-  return response.data // [{"key":null,"value":{"foo":"bar"},"partition":0,"offset":0,"topic":"jsontest"}]
+  response.data.forEach(msg => {
+    msg.isNew = msg.offset > serverRoomOffset;
+  });
+
+  return response.data; // [{"key":null,"value":{"foo":"bar"},"partition":0,"offset":0,"topic":"jsontest"}]
 }
 
 async function getKafkaConsumerUrl(roomId, userId) {
@@ -124,19 +155,20 @@ async function getKafkaConsumerUrl(roomId, userId) {
 
 
 
-  await axios({
-    method: 'post',
-    headers: { 'Content-Type': 'application/vnd.kafka.v2+json' },
-    url: `${url}/assignments`,
-    data: {
-      "partitions": [
-        {
-          "topic": roomId,
-          partition:0
-        },
-      ]
-    }
-  });      
+    // manually assigning the topic and partition. Necessary for the seek
+    await axios({
+      method: 'post',
+      headers: { 'Content-Type': 'application/vnd.kafka.v2+json' },
+      url: `${url}/assignments`,
+      data: {
+        "partitions": [
+          {
+            "topic": roomId,
+            partition: 0
+          },
+        ]
+      }
+    });
 
 
     // Seek to the first offset for each of the given partitions.
@@ -151,7 +183,7 @@ async function getKafkaConsumerUrl(roomId, userId) {
           },
         ]
       }
-    });      
+    });
 
 
 
@@ -171,5 +203,5 @@ export default {
   joinChatRoom,
   getChatRoomInfo,
   readMoreMessages,
-  exitChatRoom
+  exitChatRoom,
 };
