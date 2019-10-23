@@ -13,13 +13,16 @@ import ListItemText from '@material-ui/core/ListItemText';
 import Avatar from '@material-ui/core/Avatar';
 import { red } from '@material-ui/core/colors';
 import { Grid } from '@material-ui/core';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 import {
     useParams
 } from "react-router-dom";
+import CircularProgress from '@material-ui/core/CircularProgress';
 import Divider from '@material-ui/core/Divider';
 import chatRoomService from '../services/ChatroomService';
 import authService from '../services/AuthService';
 import PrivateHOC from './PrivateHOC';
+import { useTheme } from '@material-ui/core/styles';
 
 
 const useStyles = makeStyles(theme => ({
@@ -35,15 +38,22 @@ const useStyles = makeStyles(theme => ({
         overflowY: 'auto',
         maxWidth: '100%',
         overflowX: 'hidden',
-        wordBreak: 'break-word'
+        wordBreak: 'break-word',
+
+    },
+    messagesListEmpty: {
+        display: 'flex',
+        justifyContent: "center",
+        alignItems: "center"
     },
     userMessage: {
         display: 'flex',
         flexDirection: 'row-reverse',
-        textAlign:'right'
+        textAlign: 'right'
     },
     onlineUsersList: {
         overflowY: 'auto',
+        height: '100%',
         overflowX: 'hidden',
         borderRight: '1px solid #ccc',
     },
@@ -52,7 +62,7 @@ const useStyles = makeStyles(theme => ({
     },
     avatar: {
         backgroundColor: red[500],
-        margin: theme.spacing(0,1,0,1)
+        margin: theme.spacing(0, 1, 0, 1)
     },
 }));
 
@@ -77,15 +87,18 @@ const OnlineUsers = React.forwardRef((props, ref) => {
 function ChatRoom(props) {
     const classes = useStyles();
     const [message, setMessage] = useState('');
-    const [onlineUsers, setOnlineUsers] = useState([]);
+    const [onlineUsers, setOnlineUsers] = useState(null);
+    const [messages, setMessages] = useState(null);
     const [roomInfo, setRoomInfo] = useState({});
-    const [messages, setMessages] = useState([]);
     const topBarRef = useRef();
     const bottomBarRef = useRef();
     const msgListRef = useRef();
-    const onlineUsersListRef = useRef();
+    const onlineUsersGridRef = useRef();
     const { roomId } = useParams();
     const userId = authService.getUserId();
+    const theme = useTheme();
+    const isExtraSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+
 
 
     const handleUserTyping = (evt) => setMessage(evt.target.value);
@@ -125,8 +138,7 @@ function ChatRoom(props) {
                     }
                 })
 
-            if (newMessages.length > 0)
-                setMessages((currentMessages) => [...currentMessages, ...newMessages]);
+                setMessages((currentMessages) => currentMessages ? [...currentMessages, ...newMessages] : newMessages);
         }, 1000);
 
         return () => clearInterval(interval);
@@ -151,9 +163,11 @@ function ChatRoom(props) {
 
     // set focus on the newest message received
     useEffect(() => {
-        const lastChild = msgListRef.current.lastChild;
-        if (lastChild) {
-            lastChild.scrollIntoView(false)
+        if (messages && messages.length > 0) {
+            const lastChild = msgListRef.current.lastChild;
+            if (lastChild) {
+                lastChild.scrollIntoView(false)
+            }
         }
     }, [messages])
 
@@ -166,8 +180,10 @@ function ChatRoom(props) {
         const gridHeight = intViewportHeight - topBarHeight - bottomBarHeight;
 
         msgListRef.current.style.height = `${gridHeight}px`;
-        onlineUsersListRef.current.style.height = `${gridHeight}px`;
-
+        // maybe we're in a small screen, and the user list is hidden
+        if (onlineUsersGridRef.current) {
+            onlineUsersGridRef.current.style.height = `${gridHeight}px`;
+        }
 
     }, []);
 
@@ -181,23 +197,34 @@ function ChatRoom(props) {
 
             <Grid container className={classes.grid}>
                 {/* List of online users */}
-                <Grid display={{ xs: 'none', sm: 'block' }} item sm={4} md={3} lg={2}>
-                    <OnlineUsers users={onlineUsers} ref={onlineUsersListRef} classes={classes} />
-                </Grid>
+                {!isExtraSmallScreen && (
+                    <Grid ref={onlineUsersGridRef} item sm={4} md={3} lg={2}>
+                        {onlineUsers ? (
+                            <OnlineUsers users={onlineUsers} classes={classes} />
+                        ) : (
+                                <CircularProgress />
+                            )}
+                    </Grid>
+                )}
+
 
 
                 {/* List of messages */}
-
                 <Grid item xs={12} sm={8} md={9} lg={10}>
-                    <List className={classes.messagesList} ref={msgListRef} >
-                        {messages.map(({ data: message, userId: authorId }, idx) => (
-                            <ListItem className={userId == authorId ? classes.userMessage : ''} key={idx}>
-                                <ListItemAvatar >
-                                    <Avatar alt="Profile Picture" className={classes.avatar} />
-                                </ListItemAvatar>
-                                <ListItemText secondary={message} />
-                            </ListItem>
-                        ))}
+                    <List className={ `${classes.messagesList} ${messages==null ? classes.messagesListEmpty : ''}`} ref={msgListRef} >
+                        {messages!=null ? (
+                            messages.map(({ data: message, userId: authorId }, idx) => (
+                                <ListItem className={userId == authorId ? classes.userMessage : ''} key={idx}>
+                                    <ListItemAvatar >
+                                        <Avatar alt="Profile Picture" className={classes.avatar} />
+                                    </ListItemAvatar>
+                                    <ListItemText secondary={message} />
+                                </ListItem>
+                            ))
+                        ) : (
+                                <CircularProgress />
+                            )
+                        }
                     </List>
                 </Grid>
             </Grid>
