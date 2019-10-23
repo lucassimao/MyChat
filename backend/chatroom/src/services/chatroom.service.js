@@ -1,5 +1,7 @@
 const config = require("../config");
 const ChatroomDao = require("../dao/chatroom.dao");
+const UserDao = require('../dao/user.dao');
+
 
 // Registered user should be able to list all chatrooms available and update, delete and create his own chatrooms
 
@@ -69,7 +71,7 @@ const save = (chatroom, user) => {
  * @returns {boolean} If the was possible to join the chatroom 
  */
 const joinRoom = (chatroom, user) => {
-  return ChatroomDao.updateOne({ _id: chatroom._id}, {'$addToSet': {participants : user._id}});
+  return ChatroomDao.updateOne({ _id: chatroom._id }, { '$addToSet': { participants: user._id } });
 };
 
 /**
@@ -77,12 +79,14 @@ const joinRoom = (chatroom, user) => {
  *
  * @param {object} chatroom the chatroom the user wants to join
  * @param {object} user The authenticated user, owner of the new chatroom
+ * @param {number} lastOffset The offset of the last message read
  * @param {mongoose.Types.ObjectId} user._id The user id
  *
  * @returns {boolean} If the was possible to join the chatroom 
  */
-const exitRoom = (chatroom, user) => {
-  return ChatroomDao.updateOne({ _id: chatroom._id}, {'$pull': {participants : user._id}});
+const exitRoom = async (chatroom, user, lastOffset) => {
+  await ChatroomDao.updateOne({ _id: chatroom._id }, { '$pull': { participants: user._id } });
+  const response = await UserDao.updateOne({ _id: user._id, "offsets.roomId": String(chatroom._id) }, { $set: { "offsets.$.value": lastOffset } });
 };
 
 /**
@@ -119,7 +123,7 @@ const remove = (id, user) => {
  * @returns {Promise} A promise, which resolves to the chatroom object
  */
 const getById = (id) => {
-  return ChatroomDao.findById(id,{pic:0, dateCreated:0});
+  return ChatroomDao.findById(id, { pic: 0, dateCreated: 0 });
 };
 
 const api = {

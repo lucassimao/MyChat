@@ -32,7 +32,7 @@ router
     const chatroom = await service.getById(req.params.roomId);
     if (chatroom) {
       const participants = await UserDao.find({ _id: { $in: chatroom.participants } }, { nickname: 1, profilePic: 1 })
-      const { name, description, _id  } = chatroom;
+      const { name, description, _id } = chatroom;
       res.status(200).send({ chatroom: { name, description }, participants });
     } else {
       res.status(404).send('Chat room not found');
@@ -41,10 +41,23 @@ router
   .post(
     "/:roomId/participants",
     wrapAsync(async (req, res) => {
-      const chatroom = await service.getById(req.params.roomId);
+      const roomId = req.params.roomId;
+      const chatroom = await service.getById(roomId);
+      
       if (chatroom) {
         await service.joinRoom(chatroom, req.user);
-        res.sendStatus(200);
+        let queryResult  = await UserDao.findOne({ _id: req.user._id, 'offsets.roomId' : roomId }, { offsets: 1 });
+        let roomOffset;
+        let offsets = queryResult ? queryResult.offsets : undefined;
+
+        if (offsets && offsets.length > 0) {
+          roomOffset = offsets.find(o => o.roomId === roomId).value;
+        } else {
+          await UserDao.updateOne({ _id: req.user._id }, { $push: { offsets: { roomId: String(chatroom._id), value: 0 } } });
+          roomOffset = 0;
+        }
+        
+        res.status(200).send({ roomId: roomId, value: roomOffset });
       } else {
         res.status(404).send('Chat room not found');
       }
@@ -76,16 +89,20 @@ router
   )
   .delete(
     "/:roomId/participants",
+    express.json(),
     wrapAsync(async (req, res) => {
+      let lastOffset = req.body.offset
+      if (!lastOffset) lastOffset = 0;
+
       const chatroom = await service.getById(req.params.roomId);
       if (chatroom) {
-        await service.exitRoom(chatroom, req.user);
+        await service.exitRoom(chatroom, req.user, lastOffset);
         res.sendStatus(200);
       } else {
         res.status(404).send('Chat room not found');
       }
     })
-  )  
+  )
   .delete(
     "/:id",
     wrapAsync(async (req, res, next) => {
