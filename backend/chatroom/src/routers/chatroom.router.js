@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const service = require("../services/chatroom.service");
+const UserDao = require('../dao/user.dao');
 
 const wrapAsync = asyncMiddleware => {
   return (req, res, next) =>
@@ -27,16 +28,26 @@ router
       res.status(200).send({ chatrooms });
     })
   )
+  .get("/:roomId", wrapAsync(async (req, res) => {
+    const chatroom = await service.getById(req.params.roomId);
+    if (chatroom) {
+      const participants = await UserDao.find({ _id: { $in: chatroom.participants } }, { nickname: 1, profilePic: 1 })
+      const { name, description, _id  } = chatroom;
+      res.status(200).send({ chatroom: { name, description }, participants });
+    } else {
+      res.status(404).send('Chat room not found');
+    }
+  }))
   .post(
     "/:roomId/participants",
     wrapAsync(async (req, res) => {
-        const chatroom = await service.getById(req.params.roomId);
-        if (chatroom){
-            await service.joinRoom(chatroom,req.user);
-            res.sendStatus(200);
-        } else {
-            res.status(404).send('Chat room not found');
-        }
+      const chatroom = await service.getById(req.params.roomId);
+      if (chatroom) {
+        await service.joinRoom(chatroom, req.user);
+        res.sendStatus(200);
+      } else {
+        res.status(404).send('Chat room not found');
+      }
     })
   )
   .post(
@@ -63,6 +74,18 @@ router
       }
     })
   )
+  .delete(
+    "/:roomId/participants",
+    wrapAsync(async (req, res) => {
+      const chatroom = await service.getById(req.params.roomId);
+      if (chatroom) {
+        await service.exitRoom(chatroom, req.user);
+        res.sendStatus(200);
+      } else {
+        res.status(404).send('Chat room not found');
+      }
+    })
+  )  
   .delete(
     "/:id",
     wrapAsync(async (req, res, next) => {
