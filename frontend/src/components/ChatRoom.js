@@ -2,7 +2,6 @@ import AppBar from '@material-ui/core/AppBar';
 import { makeStyles } from '@material-ui/core/styles';
 import React, { useState, useRef, useEffect } from 'react';
 import ChatRoomToolbar from './ChatRoomToolbar';
-
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import Telegram from '@material-ui/icons/Telegram';
@@ -38,6 +37,11 @@ const useStyles = makeStyles(theme => ({
         overflowX: 'hidden',
         wordBreak: 'break-word'
     },
+    userMessage: {
+        display: 'flex',
+        flexDirection: 'row-reverse',
+        textAlign:'right'
+    },
     onlineUsersList: {
         overflowY: 'auto',
         overflowX: 'hidden',
@@ -48,6 +52,7 @@ const useStyles = makeStyles(theme => ({
     },
     avatar: {
         backgroundColor: red[500],
+        margin: theme.spacing(0,1,0,1)
     },
 }));
 
@@ -56,7 +61,7 @@ const OnlineUsers = React.forwardRef((props, ref) => {
 
     return (<List ref={ref} className={classes.onlineUsersList}>
         {users.map((user, idx) => <React.Fragment key={user._id}>
-            <ListItem button alignItems="center" >
+            <ListItem disableGutters button alignItems="center" >
                 <ListItemAvatar>
                     <Avatar className={classes.avatar} />
                 </ListItemAvatar>
@@ -104,8 +109,8 @@ function ChatRoom(props) {
         const interval = setInterval(async () => {
             const results = await chatRoomService.readMoreMessages(roomId, userId);
             let newMessages = results
-                .filter(({value:msg}) => msg.event === 'message' || (msg.event !== 'message' && msg.userId !== userId))
-                .map(({value:msg}) => {
+                .filter(({ value: msg }) => msg.event === 'message' || (msg.event !== 'message' && msg.userId !== userId))
+                .map(({ value: msg }) => {
 
                     switch (msg.event) {
                         case 'message':
@@ -185,9 +190,9 @@ function ChatRoom(props) {
 
                 <Grid item xs={12} sm={8} md={9} lg={10}>
                     <List className={classes.messagesList} ref={msgListRef} >
-                        {messages.map(({ data: message, authorId }, idx) => (
-                            <ListItem button key={idx}>
-                                <ListItemAvatar>
+                        {messages.map(({ data: message, userId: authorId }, idx) => (
+                            <ListItem className={userId == authorId ? classes.userMessage : ''} key={idx}>
+                                <ListItemAvatar >
                                     <Avatar alt="Profile Picture" className={classes.avatar} />
                                 </ListItemAvatar>
                                 <ListItemText secondary={message} />
