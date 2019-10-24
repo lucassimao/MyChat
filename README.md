@@ -1,5 +1,7 @@
 # Real-time online chat
 
+Single page chat application. One or more user(s) log(s) in into a chat room. Messages of a user are broadcasted to the channel.
+
 This project consists of two modules. The backend ( in the subfolder backend) contains the JWT based authentication microservice (written in Node.js) as well as a RESTful API for chatrooms. Both microservices utilizes MongoDB as datastore. For the delivery of messages, this project is using Apache Kafka. The frontend (in the subfolder frontend) contains a React based SPA application.
 
 ## Features
